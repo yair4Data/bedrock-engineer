@@ -1,5 +1,7 @@
 # 🤖 Bedrock Engineer
 
+this repo was based on https://github.com/Doriandarko/claude-engineer , but is using aws bedrock, so it maintain absoloute privacy for interacting with code
+ while not leaving your aws domain.
 Bedrock Engineer is an advanced interactive command-line interface (CLI) that harnesses the power of Anthropic's Claude 3 and Claude 3.5 models to assist with a wide range of software development tasks. This tool seamlessly combines the capabilities of state-of-the-art large language models with practical file system operations, web search functionality, intelligent code analysis, and execution capabilities.
 
 ## ✨ Features
