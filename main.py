@@ -5,19 +5,15 @@ from tavily import TavilyClient
 import base64
 from PIL import Image
 import io
-import re
 import difflib
-import time
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.markdown import Markdown
 import asyncio
-import aiohttp
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 import datetime
 import venv
-import subprocess
 import sys
 import signal
 import logging
@@ -80,8 +76,8 @@ MAX_CONTEXT_TOKENS = 200000  # Reduced to 200k tokens for context window
 MAINMODEL = "anthropic.claude-3-5-sonnet-20240620-v1:0"  # Maintains conversation history and file contents
 
 # Models that don't maintain context (memory is reset after each call)
-TOOLCHECKERMODEL = "anthropic.claude-3-5-sonnet-20240620-v1:0"
-CODEEDITORMODEL = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+TOOLCHECKERMODEL = "anthropic.claude-3-haiku-20240307-v1:0"#"anthropic.claude-3-5-sonnet-20240620-v1:0"
+CODEEDITORMODEL = "anthropic.claude-3-haiku-20240307-v1:0" #"anthropic.claude-3-5-sonnet-20240620-v1:0"
 CODEEXECUTIONMODEL = "anthropic.claude-3-haiku-20240307-v1:0"
 
 # System prompts
@@ -330,13 +326,6 @@ async def chat_with_claude(user_input, image_path=None, current_iteration=None, 
 
     if CONTINUATION_EXIT_PHRASE in assistant_response:
         exit_continuation = True
-    # for content_block in response.content:
-    #     if content_block.type == "text":
-    #         assistant_response += content_block.text
-    #         if CONTINUATION_EXIT_PHRASE in content_block.text:
-    #             exit_continuation = True
-    #     elif content_block.type == "tool_use":
-    #         tool_uses.append(content_block)
 
     console.print(
         Panel(Markdown(response['output']['message']['content'][0]['text']), title="Claude's Response", title_align="left", border_style="blue",
@@ -443,78 +432,6 @@ async def chat_with_claude(user_input, image_path=None, current_iteration=None, 
                     error_message = f"Error in tool response: {str(e)}"
                     console.print(Panel(error_message, title="Error", style="bold red"))
                     assistant_response += f"\n\n{error_message}"
-
-    # # Handle tool uses (if any)
-    # for tool_use in tool_uses:
-    #     tool_name = tool_use.name
-    #     tool_input = tool_use.input
-    #     tool_use_id = tool_use.id
-    #
-    #     console.print(Panel(f"Tool Used: {tool_name}", style="green"))
-    #     console.print(Panel(f"Tool Input: {json.dumps(tool_input, indent=2)}", style="green"))
-    #
-    #     tool_result = await execute_tool(tool_name, tool_input)
-    #
-    #     if tool_result["is_error"]:
-    #         console.print(Panel(tool_result["content"], title="Tool Execution Error", style="bold red"))
-    #     else:
-    #         console.print(Panel(tool_result["content"], title_align="left", title="Tool Result", style="green"))
-    #
-    #     current_conversation.append({
-    #         "role": "assistant",
-    #         "content": [
-    #             {
-    #                 "type": "tool_use",
-    #                 "id": tool_use_id,
-    #                 "name": tool_name,
-    #                 "input": tool_input
-    #             }
-    #         ]
-    #     })
-    #
-    #     current_conversation.append({
-    #         "role": "user",
-    #         "content": [
-    #             {
-    #                 "type": "tool_result",
-    #                 "tool_use_id": tool_use_id,
-    #                 "content": tool_result["content"],
-    #                 "is_error": tool_result["is_error"]
-    #             }
-    #         ]
-    #     })
-    #
-    #     # Update the file_contents dictionary if applicable
-    #     if tool_name in ['create_file', 'edit_and_apply', 'read_file'] and not tool_result["is_error"]:
-    #         if 'path' in tool_input:
-    #             file_path = tool_input['path']
-    #             if "File contents updated in system prompt" in tool_result["content"] or \
-    #                     "File created and added to system prompt" in tool_result["content"] or \
-    #                     "has been read and stored in the system prompt" in tool_result["content"]:
-    #                 # The file_contents dictionary is already updated in the tool function
-    #                 pass
-    #
-    #     messages = filtered_conversation_history + current_conversation
-    #
-    #     try:
-    #         tool_response = invoke_bedrock_model(TOOLCHECKERMODEL, messages)
-    #
-    #         # Update token usage for tool checker
-    #         tool_checker_tokens['input'] += tool_response.usage.input_tokens
-    #         tool_checker_tokens['output'] += tool_response.usage.output_tokens
-    #
-    #         tool_checker_response = ""
-    #         for tool_content_block in tool_response.content:
-    #             if tool_content_block.type == "text":
-    #                 tool_checker_response += tool_content_block.text
-    #         console.print(
-    #             Panel(Markdown(tool_checker_response), title="Claude's Response to Tool Result", title_align="left",
-    #                   border_style="blue", expand=False))
-    #         assistant_response += "\n\n" + tool_checker_response
-    #     except Exception as e:
-    #         error_message = f"Error in tool response: {str(e)}"
-    #         console.print(Panel(error_message, title="Error", style="bold red"))
-    #         assistant_response += f"\n\n{error_message}"
 
     if assistant_response:
         current_conversation.append({"role": "assistant", "content": assistant_response})
