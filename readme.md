@@ -242,4 +242,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Doriandarko/claude-engineer&type=Date)](https://star-history.com/#Doriandarko/claude-engineer&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=yair4data/bedrock-engineer&type=Date)](https://star-history.com/#yair4data/bedrock-engineer&Date)
