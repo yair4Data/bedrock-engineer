@@ -25,7 +25,6 @@ load_dotenv()
 
 import botocore
 
-boto3.setup_default_session(profile_name='staging')
 config = botocore.config.Config(
     read_timeout=900,
     connect_timeout=900,
